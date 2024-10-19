@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/kTcXW5D7bPb0C7HO14FQhluq8E7nUpU5r7OT24hSjk2Ul2zSrl6BhPphOVnFTDzob4k11d0S3zINg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 80px;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #ecf0f1;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sidebar nav ul li i {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .sidebar nav ul li:hover {
+            color: #3498db;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: #ecf0f1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin: 0;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 800px;
+        }
+        .profile-pic {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background-image: url('https://cdn-icons-png.flaticon.com/512/149/149071.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .profile-pic input {
+            display: none;
+        }
+        .profile-pic label {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background: #3498db;
+            color: #fff;
+            padding: 10px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .profile-info {
+            width: 100%;
+        }
+        .profile-info div {
+            margin-bottom: 15px;
+        }
+        .profile-info label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+        .profile-info input {
+            width: calc(100% - 20px);
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .profile-info input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        .change-password {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #3498db;
+            cursor: pointer;
+            text-align: center;
+        }
+        .logout-button {
+            background: #e74c3c;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            margin-top: 15px;
+            width: 100%;
+            text-align: center;
+        }
+        .logout-button:hover {
+            background: #c0392b;
+        }
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+        }
+        .modal-content input {
+            width: calc(100% - 20px);
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            outline: none;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+        .modal-content input:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
+        }
+        .modal-content button {
+            background: #3498db;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+            width: 100%;
+            text-align: center;
+        }
+        .modal-content button:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <nav>
+                <ul>
+                    <li onclick="redirectTo('dashboard.html')">
+                        <img src="../src/icons8-dashboard-40.png" alt="Dashboard Icon">
+                        Dashboard
+                    </li>
+                    <li onclick="redirectTo('employee.html')">
+                        <img src="../src/employee-40.png" alt="Employee Icon">
+                        Employee
+                    </li>
+                    <li onclick="redirectTo('export.html')">
+                        <img src="../src/export-csv-40.png" alt="Export Data Icon">
+                        Export Data
+                    </li>
+                    <li onclick="redirectTo('profile.html')">
+                        <img src="../src/user-profile-40.png" alt="Profile Icon">
+                        Profile
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Admin Profile</h1>
+            </div>
+            <div class="profile-container">
+                <div class="profile-pic" id="profile-pic">
+                    <input type="file" id="profile-pic-input" accept="image/*" onchange="uploadProfilePic(event)">
+                    <label for="profile-pic-input"><i class="fa fa-plus"></i></label>
+                </div>
+                <div class="profile-info">
+                    <div>
+                        <label for="full-name">Full Name</label>
+                        <input type="text" id="full-name" value="Annamalai">
+                    </div>
+                    <div>
+                        <label for="email">Email</label>
+                        <input type="email" id="email" value="Annamalai@admin.com">
+                    </div>
+                    <div>
+                        <label for="phone">Phone No</label>
+                        <input type="text" id="phone" value="987654321">
+                    </div>
+                    <div>
+                        <label for="password">Password</label>
+                        <input type="password" id="password" value="********">
+                    </div>
+                    <a class="change-password" onclick="openModal()">Change Password</a>
+                    <button class="logout-button" onclick="logout()">Logout</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <h2>Change Password</h2>
+            <input type="password" id="new-password" placeholder="New Password">
+            <input type="password" id="confirm-password" placeholder="Confirm New Password">
+            <input type="text" id="otp" placeholder="Enter OTP">
+            <button onclick="submitChangePassword()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        function redirectTo(page) {
+            window.location.href = page;
+        }
+
+        function openModal() {
+            document.getElementById("myModal").style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById("myModal").style.display = "none";
+        }
+
+        function submitChangePassword() {
+            // Add your change password logic here
+            alert('Password change functionality to be implemented.');
+            closeModal();
+        }
+
+        function logout() {
+            // Add your logout logic here
+            alert('Logout functionality to be implemented.');
+        }
+
+        // Close the modal when the user clicks anywhere outside of the modal
+        window.onclick = function(event) {
+            var modal = document.getElementById("myModal");
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>

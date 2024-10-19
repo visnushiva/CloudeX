@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/kTcXW5D7bPb0C7HO14FQhluq8E7nUpU5r7OT24hSjk2Ul2zSrl6BhPphOVnFTDzob4k11d0S3zINg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f7;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        .sidebar {
+            width: 80px;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #ecf0f1;
+        }
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+        .sidebar nav ul li {
+            margin-bottom: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .sidebar nav ul li i {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+        .sidebar nav ul li:hover {
+            color: #3498db;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: #ecf0f1;
+            overflow-y: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 28px;
+            margin: 0;
+            font-weight: 500;
+            color: #2c3e50;
+        }
+        .charts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+        }
+        .chart-container {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        canvas {
+            max-width: 100%;
+            height: 250px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <nav>
+                <ul>
+                    <li>
+                        <img src="../src/icons8-dashboard-40.png" alt="Dashboard Icon">
+                        Dashboard
+                    </li>
+                    <li>
+                        <img src="../src/employee-40.png" alt="employee Icon">
+                        Employee
+                    </li>
+                    <li>
+                        <img src="../src/export-csv-40.png" alt=" Export Data Icon">
+                        Export Data
+                    </li>
+                    <li>
+                        <img src="../src/leave-40.png" alt="Leave Icon">
+                        Leave
+                    </li>
+                    <li>
+                        <img src="../src/statistics-40.png" alt="Statistics Icon">
+                        Statistics
+                    </li>
+                    <li>
+                        <img src="../src/user-profile-40.png" alt="Profile Icon">
+                        Profile
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        <div class="main-content">
+            <div class="header">
+                <h1>Statistics</h1>
+            </div>
+            <div class="charts">
+                <div class="chart-container">
+                    <canvas id="salaryChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="leaveTrackChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="leaveBalanceChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="foodDataChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var salaryChart = new Chart(document.getElementById('salaryChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+                datasets: [{
+                    label: 'Salary Paid',
+                    data: [12000, 15000, 14000, 13000, 16000, 17000],
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        var leaveTrackChart = new Chart(document.getElementById('leaveTrackChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['Employee 1', 'Employee 2', 'Employee 3', 'Employee 4'],
+                datasets: [{
+                    label: 'Leave Taken',
+                    data: [5, 7, 3, 6],
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        var leaveBalanceChart = new Chart(document.getElementById('leaveBalanceChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: ['Employee 1', 'Employee 2', 'Employee 3', 'Employee 4'],
+                datasets: [{
+                    label: 'Leave Balance',
+                    data: [15, 13, 17, 14],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + ' days';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var foodDataChart = new Chart(document.getElementById('foodDataChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: ['Breakfast', 'Lunch', 'Dinner', 'Snacks'],
+                datasets: [{
+                    label: 'Food Consumption',
+                    data: [20, 35, 25, 20],
+                    backgroundColor: [
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(75, 192, 192, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(75, 192, 192, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return tooltipItem.label + ': ' + tooltipItem.raw + ' times';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
