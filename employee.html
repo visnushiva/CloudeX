@@ -1,0 +1,1306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Dashboard</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f5f7;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            width: 100%;
+            height: 100%;
+        }
+
+        .sidebar {
+            width: 80px;
+            background: linear-gradient(135deg, #2c3e50, #4ca1af);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #ecf0f1;
+        }
+
+        .sidebar nav ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        .sidebar nav ul li {
+            margin-bottom: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: color 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .sidebar nav ul li i {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar nav ul li:hover {
+            color: #3498db;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #ecf0f1;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-left h1 {
+            margin: 0;
+            font-size: 24px;
+            color: #2c3e50;
+        }
+
+        .header-left p {
+            color: #888;
+            margin: 5px 0 0;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+        }
+
+        .add-employee, .remove-employee {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 15px;
+            margin-right: 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .add-employee:hover, .remove-employee:hover {
+            background-color: #0056b3;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stat {
+            background-color: white;
+            border-radius: 5px;
+            padding: 20px;
+            flex: 1;
+            margin-right: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .stat:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat:last-child {
+            margin-right: 0;
+        }
+
+        .stat p {
+            margin: 0;
+            color: #888;
+        }
+
+        .stat h2 {
+            margin: 10px 0 0;
+            font-size: 28px;
+        }
+
+        .employee-table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .employee-table th, .employee-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            vertical-align: top;
+        }
+
+        .employee-table th {
+            background-color: #f7f8fa;
+            position: sticky;
+            top: 0;
+        }
+
+        .employee-table td:first-child {
+            width: 50px;
+        }
+
+        .employee-table .status {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            color: white;
+            text-align: center;
+            width: 100px;
+            display: inline-block;
+        }
+
+        .employee-table .status.active {
+            background-color: #28a745;
+        }
+
+        .employee-table .status.inactive {
+            background-color: #dc3545;
+        }
+
+        .employee-table .status.on-leave {
+            background-color: #ffc107;
+        }
+
+        .employee-name {
+            cursor: pointer;
+        }
+
+        .employee-name:hover {
+            text-decoration: underline;
+            color: #007bff;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            position: relative;
+        }
+
+        .action-dropdown {
+            display: none;
+            position: absolute;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+            z-index: 1000;
+        }
+
+        .action-dropdown a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #333;
+            transition: background-color 0.3s ease;
+        }
+
+        .action-dropdown a:hover {
+            background-color: #f0f0f0;
+        }
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #007bff;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: none; /* Change to display: block; to show the notification */
+        }
+
+        .filter-input {
+            width: calc(100% - 10px);
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .filter-select {
+            width: calc(100% - 10px);
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .clear-button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 5px;
+        }
+
+        .clear-button:hover {
+            background-color: #c82333;
+        }
+
+        .pagination {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 250px;
+        }
+
+        .pagination select {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            background-color: white;
+            width: 60%;
+            height: 80%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            overflow: auto;
+            transition: transform 0.3s ease;
+            z-index: 1001;
+            padding: 20px;
+        }
+
+        .modal.show {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-header .close-btn {
+            font-size: 20px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+        }
+
+        .tabs button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: #f0f0f0;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .tabs button.active {
+            background: #007bff;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            width: 100%;
+            margin: 15px;
+            box-sizing: border-box;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .log-entries {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .log-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-entry span {
+            flex: 1;
+            text-align: center;
+        }
+
+        .log-entry input {
+            width: 50px;
+            padding: 5px;
+        }
+
+        .log-entry select {
+            flex: 1;
+            padding: 5px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: center;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .modal-footer button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 0 10px;
+        }
+
+        .modal-footer button:hover {
+            background-color: #0056b3;
+        }
+
+        .modal-footer .close-btn {
+            background-color: #dc3545;
+        }
+
+        .modal-footer .close-btn:hover {
+            background-color: #c82333;
+        }
+
+        .employee-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            z-index: 1001;
+            width: 60%;
+        }
+
+        .employee-modal .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+        }
+
+        .employee-modal .modal-body {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .employee-modal .modal-body .form-group {
+            flex: 1;
+            min-width: 45%;
+        }
+
+        .employee-modal .modal-footer {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+
+        .employee-modal .modal-footer button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .employee-modal .modal-footer .save-btn {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .employee-modal .modal-footer .save-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .employee-modal .modal-footer .cancel-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .employee-modal .modal-footer .cancel-btn:hover {
+            background-color: #c82333;
+        }
+
+        .employee-image-upload {
+            flex: 1;
+            margin-left: 10px;
+        }
+
+        .employee-image-upload label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .employee-image-upload input[type="file"] {
+            display: none;
+        }
+
+        .employee-image-upload img {
+            width: 150px;
+            height: 150px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            object-fit: cover;
+        }
+
+        .employee-image-upload button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .employee-image-upload button:hover {
+            background-color: #0056b3;
+        }
+
+        .form-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-left {
+            margin-right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .form-right {
+            width: 60%;
+        }
+
+        .form-group-half {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .form-group-half .form-group {
+            width: 48%;
+        }
+
+        .modal-footer-right {
+            display: flex;
+            justify-content: flex-end;
+            width: 100%;
+        }
+
+        .modal-footer-right button {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <aside class="sidebar">
+            <nav>
+                <ul>
+                    <li onclick="redirectTo('dashboard.html')">
+                        <img src="../src/icons8-dashboard-40.png" alt="Dashboard Icon">
+                        Dashboard
+                    </li>
+                    <li onclick="redirectTo('employee.html')">
+                        <img src="../src/employee-40.png" alt="Employee Icon">
+                        Employee
+                    </li>
+                    <li onclick="redirectTo('export.html')">
+                        <img src="../src/export-csv-40.png" alt="Export Data Icon">
+                        Export Data
+                    </li>
+                    <li onclick="redirectTo('profile.html')">
+                        <img src="../src/user-profile-40.png" alt="Profile Icon">
+                        Profile
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        <main class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <h1>Employees</h1>
+                    <p>Complete list of employees</p>
+                </div>
+                <div class="header-right">
+                    <button class="add-employee">+ Add employee</button>
+                    <button class="remove-employee">- Remove employee</button>
+                </div>
+            </header>
+            <section class="stats">
+                <div class="stat" id="total-employees">
+                    <p>Total employees</p>
+                    <h2>50</h2>
+                </div>
+                <div class="stat" id="active-employees">
+                    <p>Active employees</p>
+                    <h2>40</h2>
+                </div>
+                <div class="stat" id="inactive-employees">
+                    <p>Yet to log in employees</p>
+                    <h2>10</h2>
+                </div>
+                <div class="stat" id="amount-to-be-paid" onclick="redirectToPaymentPage()">
+                    <p>Amount to be Paid</p>
+                    <h2>&#8377; 5,00,000</h2>
+                </div>
+            </section>
+            <table class="employee-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Role</th>
+                        <th>Phone no</th>
+                        <th>Project</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                    <tr>
+                        <th><input type="text" class="filter-input" placeholder="Filter ID"></th>
+                        <th><input type="text" class="filter-input" placeholder="Filter Name"></th>
+                        <th>
+                            <select class="filter-select" id="role-filter">
+                                <option value="">All Roles</option>
+                                <option value="User Researcher">User Researcher</option>
+                                <option value="QA Engineer">QA Engineer</option>
+                                <option value="Innovation Manager">Innovation Manager</option>
+                                <option value="Developer">Developer</option>
+                                <option value="Designer">Designer</option>
+                            </select>
+                        </th>
+                        <th><input type="text" class="filter-input" placeholder="Filter Phone"></th>
+                        <th>
+                            <select class="filter-select" id="project-filter">
+                                <option value="">All Projects</option>
+                                <option value="NHS">NHS</option>
+                                <option value="XYZ">XYZ</option>
+                                <option value="ABC">ABC</option>
+                                <option value="PQR">PQR</option>
+                            </select>
+                        </th>
+                        <th>
+                            <select class="filter-select" id="status-filter">
+                                <option value="">All Statuses</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                                <option value="On Leave">On Leave</option>
+                            </select>
+                        </th>
+                        <th>
+                            <button class="clear-button" id="clear-filters">Clear</button>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="employee-table-body">
+                    <!-- Sample data rows -->
+                    <tr>
+                        <td>1</td>
+                        <td><a class="employee-name" data-id="1">Vishnu Siva</a></td>
+                        <td>User Researcher</td>
+                        <td>07700 107123</td>
+                        <td>NHS</td>
+                        <td><span class="status active">Active</span></td>
+                        <td>
+                            <button class="action-btn">...</button>
+                            <div class="action-dropdown">
+                                <a href="#" class="change-status" data-status="On Leave">Change to On Leave</a>
+                                <a href="#" class="change-status" data-status="Inactive">Change to Inactive</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td><a class="employee-name" data-id="2">Sibi Vishnu</a></td>
+                        <td>QA Engineer</td>
+                        <td>07700 900123</td>
+                        <td>XYZ</td>
+                        <td><span class="status inactive">Inactive</span></td>
+                        <td>
+                            <button class="action-btn">...</button>
+                            <div class="action-dropdown">
+                                <a href="#" class="change-status" data-status="Active">Change to Active</a>
+                                <a href="#" class="change-status" data-status="On Leave">Change to On Leave</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td><a class="employee-name" data-id="3">Varun S</a></td>
+                        <td>QA Engineer</td>
+                        <td>07740 506178</td>
+                        <td>ABC</td>
+                        <td><span class="status on-leave">On Leave</span></td>
+                        <td>
+                            <button class="action-btn">...</button>
+                            <div class="action-dropdown">
+                                <a href="#" class="change-status" data-status="Active">Change to Active</a>
+                                <a href="#" class="change-status" data-status="Inactive">Change to Inactive</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Additional rows... -->
+                    <!-- Repeat similar structure for 50 total rows -->
+                    <!-- Example repeated data for simplicity -->
+                    <tr>
+                        <td>4</td>
+                        <td><a class="employee-name" data-id="4">Shananth Kumar</a></td>
+                        <td>User Researcher</td>
+                        <td>07790 206321</td>
+                        <td>PQR</td>
+                        <td><span class="status active">Active</span></td>
+                        <td>
+                            <button class="action-btn">...</button>
+                            <div class="action-dropdown">
+                                <a href="#" class="change-status" data-status="On Leave">Change to On Leave</a>
+                                <a href="#" class="change-status" data-status="Inactive">Change to Inactive</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td><a class="employee-name" data-id="5">Robert Fox</a></td>
+                        <td>Innovation Manager</td>
+                        <td>07790 206321</td>
+                        <td>NHS</td>
+                        <td><span class="status inactive">Inactive</span></td>
+                        <td>
+                            <button class="action-btn">...</button>
+                            <div class="action-dropdown">
+                                <a href="#" class="change-status" data-status="Active">Change to Active</a>
+                                <a href="#" class="change-status" data-status="On Leave">Change to On Leave</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>6</td>
+                        <td><a class="employee-name" data-id="6">Darrell Steward</a></td>
+                        <td>QA Engineer</td>
+                        <td>07700 107123</td>
+                        <td>XYZ</td>
+                        <td><span class="status on-leave">On Leave</span></td>
+                        <td>
+                            <button class="action-btn">...</button>
+                            <div class="action-dropdown">
+                                <a href="#" class="change-status" data-status="Active">Change to Active</a>
+                                <a href="#" class="change-status" data-status="Inactive">Change to Inactive</a>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- Additional 44 rows to reach 50 total -->
+                </tbody>
+            </table>
+            <div class="notification">
+                <p>Employee data updated successfully</p>
+            </div>
+        </main>
+    </div>
+
+    <div class="pagination">
+        <p>Showing 1-10 of 50 employees</p>
+        <select>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+        </select>
+    </div>
+
+    <div class="modal" id="employee-modal">
+        <div class="modal-header">
+            <h2>Employee Details</h2>
+            <button class="close-btn" onclick="closeModal()">X</button>
+        </div>
+        <div class="modal-body form-container">
+            <div class="form-right">
+                <div class="form-group-half">
+                    <div class="form-group">
+                        <label for="employee-name">Name</label>
+                        <input type="text" id="employee-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-phone">Phone</label>
+                        <input type="text" id="employee-phone">
+                    </div>
+                </div>
+                <div class="form-group-half">
+                    <div class="form-group">
+                        <label for="employee-email">Email</label>
+                        <input type="text" id="employee-email">
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-joining-date">Joining Date</label>
+                        <input type="date" id="employee-joining-date">
+                    </div>
+                </div>
+                <div class="form-group-half">
+                    <div class="form-group">
+                        <label for="employee-role">Role</label>
+                        <select id="employee-role">
+                            <option value="User Researcher">User Researcher</option>
+                            <option value="QA Engineer">QA Engineer</option>
+                            <option value="Innovation Manager">Innovation Manager</option>
+                            <option value="Developer">Developer</option>
+                            <option value="Designer">Designer</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-project">Project</label>
+                        <select id="employee-project">
+                            <option value="NHS">NHS</option>
+                            <option value="XYZ">XYZ</option>
+                            <option value="ABC">ABC</option>
+                            <option value="PQR">PQR</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group-half">
+                    <div class="form-group">
+                        <label for="employee-status">Status</label>
+                        <select id="employee-status">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                            <option value="On Leave">On Leave</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-bank-details">Bank Details</label>
+                        <input type="text" id="employee-bank-details">
+                    </div>
+                </div>
+                <div class="form-group-half">
+                    <div class="form-group">
+                        <label for="employee-address">Address</label>
+                        <input type="text" id="employee-address">
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-dob">Date of Birth</label>
+                        <input type="date" id="employee-dob">
+                    </div>
+                </div>
+                <div class="form-group-half">
+                    <div class="form-group">
+                        <label for="employee-emergency-contact">Emergency Contact</label>
+                        <input type="text" id="employee-emergency-contact">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer modal-footer-right">
+            <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+            <button class="save-btn" onclick="saveEmployeeDetails()">Save</button>
+        </div>
+    </div>
+
+    <div class="employee-modal" id="add-employee-modal">
+        <div class="modal-header">
+            <h2>New Employee</h2>
+            <button class="close-btn" onclick="closeAddEmployeeModal()">X</button>
+        </div>
+        <div class="modal-body form-container">
+            <div class="form-left">
+                <div class="employee-image-upload">
+                    <label for="employee-image">Upload Photo</label>
+                    <img id="employee-image-preview-add" src="#" alt="Employee Image" style="display: none;">
+                    <input type="file" id="employee-image-add" accept="image/*" onchange="previewImageAdd(event)">
+                    <button onclick="document.getElementById('employee-image-add').click()">Upload Photo</button>
+                </div>
+            </div>
+            <div class="form-right">
+                <div class="form-group-half">
+                    <div class="form-group">
+                        <label for="first-name">First Name</label>
+                        <input type="text" id="first-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="middle-name">Middle Name</label>
+                        <input type="text" id="middle-name">
+                    </div>
+                </div>
+                <div class="form-group-half">
+                    <div class="form-group">
+                        <label for="last-name">Last Name</label>
+                        <input type="text" id="last-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-id">Employee ID</label>
+                        <input type="text" id="employee-id">
+                    </div>
+                </div>
+                <div class="form-group-half">
+                    <div class="form-group">
+                        <label for="email-address">Email</label>
+                        <input type="email" id="email-address">
+                    </div>
+                    <div class="form-group">
+                        <label for="employee-type">Employee Type</label>
+                        <select id="employee-type">
+                            <option value="On Contract">On Contract</option>
+                            <option value="Permanent">Permanent</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group-half">
+                    <div class="form-group">
+                        <label for="employee-status">Employee Status</label>
+                        <select id="employee-status">
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="date-of-hire">Date of Hire</label>
+                        <input type="date" id="date-of-hire">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer modal-footer-right">
+            <button class="cancel-btn" onclick="closeAddEmployeeModal()">Cancel</button>
+            <button class="save-btn" onclick="createEmployee()">Create Employee</button>
+        </div>
+    </div>
+
+    <div class="employee-modal" id="remove-employee-modal">
+        <div class="modal-header">
+            <h2>Remove Employee</h2>
+            <button class="close-btn" onclick="closeRemoveEmployeeModal()">X</button>
+        </div>
+        <div class="modal-body form-container">
+            <div class="form-right">
+                <div class="form-group">
+                    <label for="search-id">Search by ID</label>
+                    <input type="text" id="search-id" oninput="searchEmployeeById()">
+                </div>
+                <div class="form-group">
+                    <label for="search-name">Search by Name</label>
+                    <input type="text" id="search-name" oninput="searchEmployeeByName()">
+                </div>
+                <div class="form-group">
+                    <label for="search-results">Search Results</label>
+                    <select id="search-results" size="10"></select>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer modal-footer-right">
+            <button class="cancel-btn" onclick="removeSelectedEmployee()">Remove</button>
+            <button class="cancel-btn" onclick="closeRemoveEmployeeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        function redirectTo(page) {
+            window.location.href = page;
+        }
+        document.querySelectorAll('.filter-input').forEach(input => {
+            input.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    filterTable();
+                }
+            });
+        });
+
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', function (e) {
+                filterTable();
+            });
+        });
+
+        document.getElementById('clear-filters').addEventListener('click', function() {
+            document.querySelectorAll('.filter-input').forEach(input => input.value = '');
+            document.querySelectorAll('.filter-select').forEach(select => select.value = '');
+            filterTable();
+        });
+
+        document.querySelectorAll('.stat').forEach(stat => {
+            stat.addEventListener('click', function(e) {
+                const id = e.target.id;
+                if (id === 'total-employees') {
+                    document.getElementById('status-filter').value = '';
+                } else if (id === 'active-employees') {
+                    document.getElementById('status-filter').value = 'Active';
+                } else if (id === 'inactive-employees') {
+                    document.getElementById('status-filter').value = 'Inactive';
+                }
+                filterTable();
+            });
+        });
+
+        function filterTable() {
+            const filters = {
+                id: document.querySelector('.filter-input[placeholder="Filter ID"]').value.toLowerCase(),
+                name: document.querySelector('.filter-input[placeholder="Filter Name"]').value.toLowerCase(),
+                role: document.getElementById('role-filter').value.toLowerCase(),
+                phone: document.querySelector('.filter-input[placeholder="Filter Phone"]').value.toLowerCase(),
+                project: document.getElementById('project-filter').value.toLowerCase(),
+                status: document.getElementById('status-filter').value.toLowerCase()
+            };
+
+            const rows = document.querySelectorAll('.employee-table tbody tr');
+            rows.forEach(row => {
+                const cells = row.children;
+                const id = cells[0].textContent.toLowerCase();
+                const name = cells[1].textContent.toLowerCase();
+                const role = cells[2].textContent.toLowerCase();
+                const phone = cells[3].textContent.toLowerCase();
+                const project = cells[4].textContent.toLowerCase();
+                const status = cells[5].textContent.toLowerCase();
+
+                const matches = Object.keys(filters).every(key => {
+                    return filters[key] === '' || cells[key === 'id' ? 0 : key === 'name' ? 1 : key === 'role' ? 2 : key === 'phone' ? 3 : key === 'project' ? 4 : 5].textContent.toLowerCase().includes(filters[key]);
+                });
+
+                row.style.display = matches ? '' : 'none';
+            });
+        }
+
+        document.querySelectorAll('.action-btn').forEach(button => {
+            button.addEventListener('click', function (e) {
+                const dropdown = button.nextElementSibling;
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            });
+        });
+
+        document.querySelectorAll('.change-status').forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+                const status = e.target.getAttribute('data-status');
+                const row = e.target.closest('tr');
+                const statusCell = row.querySelector('.status');
+                statusCell.textContent = status;
+                statusCell.className = 'status ' + status.toLowerCase().replace(' ', '-');
+                statusCell.style.backgroundColor = getStatusColor(status);
+                const dropdown = row.querySelector('.action-dropdown');
+                dropdown.style.display = 'none';
+            });
+        });
+
+        function getStatusColor(status) {
+            switch (status) {
+                case 'Active': return '#28a745';
+                case 'Inactive': return '#dc3545';
+                case 'On Leave': return '#ffc107';
+                default: return '#007bff';
+            }
+        }
+
+        function attachNameClickEvents() {
+            document.querySelectorAll('.employee-name').forEach(name => {
+                name.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const row = e.target.closest('tr');
+                    const id = e.target.getAttribute('data-id');
+                    const nameText = row.children[1].textContent;
+                    const role = row.children[2].textContent;
+                    const phone = row.children[3].textContent;
+                    const project = row.children[4].textContent;
+                    const status = row.children[5].textContent;
+
+                    // Assuming these fields exist in the row data
+                    const email = 'example@example.com'; // Add the correct email data
+                    const joiningDate = '2020-01-01'; // Add the correct joining date data
+                    const bankDetails = '1234-5678-9101-1121'; // Add the correct bank details data
+                    const address = '123 Main St, City, Country'; // Add the correct address data
+                    const dob = '1990-01-01'; // Add the correct date of birth data
+                    const emergencyContact = '07700 123456'; // Add the correct emergency contact data
+
+                    document.getElementById('employee-name').value = nameText;
+                    document.getElementById('employee-phone').value = phone;
+                    document.getElementById('employee-email').value = email;
+                    document.getElementById('employee-joining-date').value = joiningDate;
+                    document.getElementById('employee-role').value = role;
+                    document.getElementById('employee-project').value = project;
+                    document.getElementById('employee-status').value = status;
+                    document.getElementById('employee-bank-details').value = bankDetails;
+                    document.getElementById('employee-address').value = address;
+                    document.getElementById('employee-dob').value = dob;
+                    document.getElementById('employee-emergency-contact').value = emergencyContact;
+
+                    document.getElementById('employee-modal').classList.add('show');
+                    document.getElementById('employee-modal').setAttribute('data-id', id);
+                });
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('employee-modal').classList.remove('show');
+        }
+
+        function saveEmployeeDetails() {
+            const id = document.getElementById('employee-modal').getAttribute('data-id');
+            const name = document.getElementById('employee-name').value;
+            const phone = document.getElementById('employee-phone').value;
+            const email = document.getElementById('employee-email').value;
+            const joiningDate = document.getElementById('employee-joining-date').value;
+            const role = document.getElementById('employee-role').value;
+            const project = document.getElementById('employee-project').value;
+            const status = document.getElementById('employee-status').value;
+            const bankDetails = document.getElementById('employee-bank-details').value;
+            const address = document.getElementById('employee-address').value;
+            const dob = document.getElementById('employee-dob').value;
+            const emergencyContact = document.getElementById('employee-emergency-contact').value;
+
+            const row = document.querySelector(`.employee-table tbody tr td a[data-id="${id}"]`).closest('tr');
+            row.children[1].innerHTML = `<a class="employee-name" data-id="${id}">${name}</a>`;
+            row.children[2].textContent = role;
+            row.children[3].textContent = phone;
+            row.children[4].textContent = project;
+            row.children[5].innerHTML = `<span class="status ${status.toLowerCase().replace(' ', '-')}">${status}</span>`;
+
+            attachNameClickEvents(); // Re-attach click event to the updated name link
+
+            closeModal();
+        }
+
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('employee-image-preview');
+                output.src = reader.result;
+                output.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function previewImageAdd(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('employee-image-preview-add');
+                output.src = reader.result;
+                output.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        document.querySelectorAll('.add-employee').forEach(button => {
+            button.addEventListener('click', function () {
+                document.getElementById('add-employee-modal').style.display = 'block';
+            });
+        });
+
+        function closeAddEmployeeModal() {
+            document.getElementById('add-employee-modal').style.display = 'none';
+        }
+
+        function createEmployee() {
+            const firstName = document.getElementById('first-name').value;
+            const middleName = document.getElementById('middle-name').value;
+            const lastName = document.getElementById('last-name').value;
+            const employeeId = document.getElementById('employee-id').value;
+            const emailAddress = document.getElementById('email-address').value;
+            const employeeType = document.getElementById('employee-type').value;
+            const employeeStatus = document.getElementById('employee-status').value;
+            const dateOfHire = document.getElementById('date-of-hire').value;
+
+            // Generate a new employee ID (simplified)
+            const newEmployeeId = Math.max(...Array.from(document.querySelectorAll('.employee-table tbody tr')).map(tr => parseInt(tr.children[0].textContent))) + 1;
+
+            // Create a new row in the employee table
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <td>${newEmployeeId}</td>
+                <td><a class="employee-name" data-id="${newEmployeeId}">${firstName} ${lastName}</a></td>
+                <td>${employeeType}</td>
+                <td>${emailAddress}</td>
+                <td>${dateOfHire}</td>
+                <td><span class="status ${employeeStatus.toLowerCase().replace(' ', '-')}">${employeeStatus}</span></td>
+                <td>
+                    <button class="action-btn">...</button>
+                    <div class="action-dropdown">
+                        <a href="#" class="change-status" data-status="On Leave">Change to On Leave</a>
+                        <a href="#" class="change-status" data-status="Inactive">Change to Inactive</a>
+                    </div>
+                </td>
+            `;
+
+            document.getElementById('employee-table-body').appendChild(newRow);
+            attachNameClickEvents(); // Re-attach click event to the new name link
+
+            closeAddEmployeeModal();
+        }
+
+        function saveAndAddAnother() {
+            createEmployee();
+            document.getElementById('first-name').value = '';
+            document.getElementById('middle-name').value = '';
+            document.getElementById('last-name').value = '';
+            document.getElementById('employee-id').value = '';
+            document.getElementById('email-address').value = '';
+            document.getElementById('employee-type').value = 'On Contract';
+            document.getElementById('employee-status').value = 'Active';
+            document.getElementById('date-of-hire').value = '';
+            document.getElementById('employee-image-preview-add').style.display = 'none';
+        }
+
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('employee-image-preview');
+                output.src = reader.result;
+                output.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function previewImageAdd(event) {
+            const reader = new FileReader();
+            reader.onload = function() {
+                const output = document.getElementById('employee-image-preview-add');
+                output.src = reader.result;
+                output.style.display = 'block';
+            }
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        document.querySelector('.remove-employee').addEventListener('click', function () {
+            document.getElementById('remove-employee-modal').style.display = 'block';
+        });
+
+        function closeRemoveEmployeeModal() {
+            document.getElementById('remove-employee-modal').style.display = 'none';
+        }
+
+        function searchEmployeeById() {
+            const searchId = document.getElementById('search-id').value.toLowerCase();
+            const results = Array.from(document.querySelectorAll('.employee-table tbody tr')).filter(tr => tr.children[0].textContent.toLowerCase().includes(searchId));
+            populateSearchResults(results);
+        }
+
+        function searchEmployeeByName() {
+            const searchName = document.getElementById('search-name').value.toLowerCase();
+            const results = Array.from(document.querySelectorAll('.employee-table tbody tr')).filter(tr => tr.children[1].textContent.toLowerCase().includes(searchName));
+            populateSearchResults(results);
+        }
+
+        function populateSearchResults(results) {
+            const searchResults = document.getElementById('search-results');
+            searchResults.innerHTML = '';
+            results.forEach(result => {
+                const option = document.createElement('option');
+                option.value = result.children[0].textContent;
+                option.textContent = result.children[1].textContent;
+                searchResults.appendChild(option);
+            });
+        }
+
+        function removeSelectedEmployee() {
+            const selectedId = document.getElementById('search-results').value;
+            if (selectedId) {
+                const row = document.querySelector(`.employee-table tbody tr td a[data-id="${selectedId}"]`).closest('tr');
+                row.remove();
+                closeRemoveEmployeeModal();
+            }
+        }
+
+        function redirectToPaymentPage() {
+            window.location.href = 'export.html';
+        }
+
+        // Initial attachment of name click events
+        attachNameClickEvents();
+    </script>
+</body>
+</html>
